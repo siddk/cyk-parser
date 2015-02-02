@@ -26,7 +26,7 @@
 ;;    terminals (such as "x" and "+").
 ;; 2) The left hand side of any rule must be a non-terminal.
 ;; 3) A non-terminal can be the left hand side of many rules (see Expr
-;;    and Op for example). 
+;;    and Op for example).
 ;; 4) Grammars can contain cycles.  For example, in the above grammar,
 ;;    an Expr can have an OpExpr as a child, which can have another
 ;;    Expr as a grandchild.
@@ -41,5 +41,5 @@
 (define-syntax define-grammar
   (syntax-rules (->)
     [(_ name ((binary-nonterminal -> left right) ...) ((unary-nonterminal -> terminal) ...))
-     (begin (display "Define-grammar is not implemented yet!\n")
+        (begin (display "Define-grammar is not implemented yet!\n")
             (define name 'stub))]))
