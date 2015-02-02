@@ -40,6 +40,6 @@
 ;; CYK parser can understand.
 (define-syntax define-grammar
   (syntax-rules (->)
-    [(_ name ((binary-nonterminal -> left right) ...) ((unary-nonterminal -> terminal) ...))
+    [(define-grammar name ((binary-nonterminal -> left right) ...) ((unary-nonterminal -> terminal) ...))
         (begin (display "Define-grammar is not implemented yet!\n")
-            (define name 'stub))]))
+               (define name 'stub))]))
