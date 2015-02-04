@@ -6,7 +6,7 @@
 ;; Definitions of the grammar data structure, as well as a macro to
 ;; make it easy to define grammars.
 
-;; TODO: Create a representation for grammars.
+;; Create a representation for grammars.
 
 ;; TODO: Write "define-grammar" that makes it easy to define
 ;; grammars. Here is a start, which you may want to use (but feel free
