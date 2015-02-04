@@ -30,12 +30,6 @@
 ;; 4) Grammars can contain cycles.  For example, in the above grammar,
 ;;    an Expr can have an OpExpr as a child, which can have another
 ;;    Expr as a grandchild.
-;; As a bonus, have it support more types of rules.  For example, I
-;; would like to write something like:
-;; (define-better-grammar arith
-;;   (Expr -> Var Op Expr)
-;;   (Var -> ("a" "b" "x" "y" "z"))
-;;   (Op -> ("+" "-" "*" "/")))
 ;; You can transform these rules into Chomsky Normal Form, which the
 ;; CYK parser can understand.
 (define-syntax define-grammar
