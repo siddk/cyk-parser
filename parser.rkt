@@ -27,6 +27,19 @@
                     '()) ;; Side-effect free else clause.
                 (set! j (+ j 1))))
         (set! i (+ i 1))))
+  ;; for each i = 2 to n -- Length of span
+  ;;   for each j = 1 to n-i+1 -- Start of span
+  ;;     for each k = 1 to i-1 -- Partition of span
+  (for ([i (in-range 2 n)])
+    (for ([j (in-range 1 (+ (- n i) 1))])
+        (for ([k (in-range 1 (- i 1))])
+            ;; for each production RA -> RB RC
+            (for/list ([pj grammar])
+                (if (not (production-is-unit pj))
+                    ;; if P[j,k,B] and P[j+k,i-k,C] then set P[j,i,A] = true
+                    (if (hash-ref parse-node '(j, k, ')))
+
+                )
   (printf "~a\n" (parse-node-nodeB (hash-ref parse-hash '(i 1 j)))))
 
 ;; Test parser with simple lists
