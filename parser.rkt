@@ -30,20 +30,33 @@
   ;; for each i = 2 to n -- Length of span
   ;;   for each j = 1 to n-i+1 -- Start of span
   ;;     for each k = 1 to i-1 -- Partition of span
-  (for ([i (in-range 2 n)])
-    (for ([j (in-range 1 (+ (- n i) 1))])
-        (for ([k (in-range 1 (- i 1))])
-            ;; for each production RA -> RB RC
-            (for/list ([pj grammar])
-                (if (not (production-is-unit pj))
-                    ;; if P[j,k,B] and P[j+k,i-k,C] then set P[j,i,A] = true
-                    (if (hash-ref parse-node '(j, k, ')))
+  (let ([n (length tokens)])
+    (for ([i (in-range 2 n)])
+        (for ([j (in-range 1 (+ (- n i) 1))])
+            (for ([k (in-range 1 (- i 1))])
+                ;; for each production RA -> RB RC
+                (let ([index 1])
+                    (for/list ([pj grammar])
+                        (if (not (production-is-unit pj))
+                            ;; if P[j,k,B] and P[j+k,i-k,C] then set P[j,i,A] = true
+                            (if ((hash-ref parse-hash '(j k (production-right-first-index pj)) false) and
+                                    (hash-ref parse-hash '((+ j k) (- i k) (production-right-second-index pj)) false))
+                                (hash-set! parse-hash '(j i (production-left-index pj)) (parse-node true pj ai))
+                                '())))))))) ;; Side-effect free else clause.
+  ;; if any of P[1,n,x] is true (x is iterated over the set s, where s are all the indices for Rs)
+  (let ([is-member false])
+    (for ([i (in-range 1 (length grammar))])
+        (set! is-member (is-member or (hash-ref parse-hash '(1 n i) false))))
+    (if (is-member)
+        parse-hash
+        false)))
+
 
                 )
   (printf "~a\n" (parse-node-nodeB (hash-ref parse-hash '(i 1 j)))))
 
 ;; Test parser with simple lists
-(define m1 (production true "Var" "x" '()))
-(define m2 (production false "Expr" "Var" "OpExpr"))
+(define m1 (production true "Var" "x" 0 '() '()))
+(define m2 (production false "Expr" "Var" 0 "OpExpr" 2))
 (parse (list m1 m2) (list "a" "b" "c"))
 

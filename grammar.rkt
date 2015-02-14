@@ -6,7 +6,7 @@
 
 ;; Definitions of the grammar data structure, as well as a macro to
 ;; make it easy to define grammars.
-(struct production (is-unit left right-first right-second))
+(struct production (is-unit left left-index right-first right-first-index right-second right-second-index))
 
 ;; Write "define-grammar" that makes it easy to define
 ;; grammars. Here is a start, which you may want to use (but feel free
