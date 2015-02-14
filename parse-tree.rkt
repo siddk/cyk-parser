@@ -1,14 +1,15 @@
 #lang racket
 
-;; TODO: Provide other functions needed to work with parse trees.
+;; Provide other functions needed to work with parse trees.
 (provide parse-tree->list)
+(provide (struct-out parse-node))
 
 ;; Definitions of the parse tree data structure.
 
-;; TODO: Create a representation for parse trees.
+;; Create a representation for parse trees.
+(struct parse-node (boolean nodeA nodeB))
 
-
-;; TODO: Implement parse-tree->list.  An example of its use can
+;; Implement parse-tree->list.  An example of its use can
 ;; be found in tests.rkt.
 (define (parse-tree->list tree)
   '())

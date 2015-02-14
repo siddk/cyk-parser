@@ -1,14 +1,14 @@
 #lang racket
 
-;; TODO: Provide other functions needed to work with grammars.
+;; Provide other functions needed to work with grammars.
 (provide define-grammar)
+(provide (struct-out production))
 
 ;; Definitions of the grammar data structure, as well as a macro to
 ;; make it easy to define grammars.
+(struct production (is-unit left right-first right-second))
 
-;; Create a representation for grammars.
-
-;; TODO: Write "define-grammar" that makes it easy to define
+;; Write "define-grammar" that makes it easy to define
 ;; grammars. Here is a start, which you may want to use (but feel free
 ;; to ignore it).
 ;; As currently written, it only supports rules of the form A -> B C
