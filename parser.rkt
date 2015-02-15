@@ -76,7 +76,7 @@
                 (for/list ([pj (grammar-production-list basic-grammar)])
                     (for/list ([right-first-index (lookup-in-hash grammar (production-right-first))])
                         (if (not (production-is-unit pj))
-                            (if (parse-node-boolean (hash-ref parse-hash (list i j right-first-index) (parse-node-false "" "")))
+                            (if (parse-node-boolean (hash-ref parse-hash (list i j right-first-index) (parse-node false "" "")))
                                 (hash-set! parse-hash (list j i (lookup-in-hash grammar (production-left pj)))
                                                       (parse-node true pj (list-ref tokens i)))
                                 '())            ;; Side-effect free else clause.
