@@ -3,9 +3,11 @@
 ;; Provide other functions needed to work with grammars.
 (provide define-grammar)
 (provide (struct-out production))
+(provide (struct-out grammar))
 
 ;; Definitions of the grammar data structure, as well as a macro to
 ;; make it easy to define grammars.
+(struct grammar (production-list rule-hash))
 (struct production (is-unit left left-index right-first right-first-index right-second right-second-index))
 
 ;; Write "define-grammar" that makes it easy to define

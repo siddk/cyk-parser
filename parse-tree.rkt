@@ -11,5 +11,5 @@
 
 ;; Implement parse-tree->list.  An example of its use can
 ;; be found in tests.rkt.
-(define (parse-tree->list tree)
+(define (parse-tree->list hash)
   '())
