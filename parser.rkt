@@ -73,15 +73,10 @@
 
 (define (valid-parse basic-grammar tokens parse-hash)
     ;; If any of P[1,n,x] is true (x is iterated over the set s, where s are all the indices for Rs)
-    (let ([is-member false] [start-index 0])
-        (for ([i (in-range 1 (length (grammar-production-list basic-grammar)))])
-            (set! is-member (or is-member (hash-ref parse-hash (list 1 (length tokens) i) false)))
-            (if (and (not (= start-index 0)) is-member)
-                (set! start-index i)
-                '()))
-        (if is-member
-            (list start-index parse-hash)
-            false)))
+    (for ([(key value) (in-hash parse-hash)])
+        (if (match key (list 1 (length tokens) _))
+            (list key parse-hash)
+            '())))
 
 (define (lookup-in-hash basic-grammar production-element)
     (hash-ref (grammar-rule-hash basic-grammar) production-element '()))
@@ -89,6 +84,9 @@
 (define (print-hash hash)
     (for ([(key value) (in-hash hash)])
         (printf "Key: ~a\n" key)))
+
+; (define (print-parse-node parse-output)
+;     (for ([(key value) (in-hash hash)]
 
 
 
