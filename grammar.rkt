@@ -8,7 +8,7 @@
 ;; Definitions of the grammar data structure, as well as a macro to
 ;; make it easy to define grammars.
 (struct grammar (production-list rule-hash))
-(struct production (is-unit left right-first right-second))
+(struct production (is-unit index left right-first right-second))
 
 ;; Write "define-grammar" that makes it easy to define
 ;; grammars. Here is a start, which you may want to use (but feel free
