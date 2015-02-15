@@ -1,7 +1,6 @@
 #lang racket
 
 (require "grammar.rkt" "parse-tree.rkt")
-
 (provide parse)
 
 ;; CYK parser generator.
@@ -16,7 +15,7 @@
     (for ([j (in-range 1 (+ 1 (length tokens)))])
         (unary-parse 1 j basic-grammar tokens parse-hash))
     (parse-production basic-grammar tokens parse-hash)
-    (valid-parse basic-grammar tokens parse-hash))
+    (parse-tree->list tokens (valid-parse basic-grammar tokens parse-hash) ""))
 
 
 (define (parse-unit-production basic-grammar tokens parse-hash)
@@ -30,10 +29,22 @@
                     ; (printf "Entering grammar/token loop ~a, ~a\n" (production-left pj) ai)
                     ;; Check if unit production
                     (if (and (production-is-unit pj) (eq? (production-right-first pj) ai))
-                        (hash-set! parse-hash (list i 1 j) (parse-node true pj ai))
+                        (hash-set! parse-hash (list i 1 j) (parse-node true pj i 1 "" ""))
                         '()) ;; Side-effect free else clause.
                     (set! j (+ j 1))))
             (set! i (+ i 1)))))
+
+(define (unary-parse i j basic-grammar tokens parse-hash)
+    ;; Handle RA -> RB style rules.
+    (for/list ([pj (grammar-production-list basic-grammar)])
+        (if (and (not (production-is-unit pj)) (eq? (production-right-second pj) ""))
+            (for/list ([right-first-index (lookup-in-hash basic-grammar (production-right-first pj))])
+                (let ([first-node (hash-ref parse-hash (list j i right-first-index) default-false-node)])
+                    (if (parse-node-boolean first-node)
+                        (hash-set! parse-hash (list j i (production-index pj))
+                                              (parse-node true pj j i first-node ""))
+                        '())))      ;; Side-effect free else clause.
+        '())))                      ;; Side-effect free else clause.
 
 (define (parse-production basic-grammar tokens parse-hash)
     ; for each i = 2 to n -- Length of span
@@ -53,42 +64,27 @@
             (for/list ([right-first-index (lookup-in-hash basic-grammar (production-right-first pj))])
                 (for/list ([right-second-index (lookup-in-hash basic-grammar (production-right-second pj))])
                     ;; if P[j,k,B] and P[j+k,i-k,C] then set P[j,i,A] = true
-                    (if (and (parse-node-boolean (hash-ref parse-hash (list j k right-first-index)
-                                                                      (parse-node false "" ""))) ; Default false
-                             (parse-node-boolean (hash-ref parse-hash (list (+ j k) (- i k) right-second-index)
-                                                                      (parse-node false "" "")))) ; Default false
-                        (hash-set! parse-hash (list j i (production-index pj)) (parse-node true pj (list-ref tokens (- j 1))))
-                        '())))    ;; Side-effect free else clause.
-            '())))                ;; Side-effect free else clause.
-
-(define (unary-parse i j basic-grammar tokens parse-hash)
-    ;; Handle RA -> RB style rules.
-    (for/list ([pj (grammar-production-list basic-grammar)])
-        (if (and (not (production-is-unit pj)) (eq? (production-right-second pj) ""))
-            (for/list ([right-first-index (lookup-in-hash basic-grammar (production-right-first pj))])
-                (if (parse-node-boolean (hash-ref parse-hash (list j i right-first-index) (parse-node false "" "")))
-                    (hash-set! parse-hash (list j i (production-index pj)) (parse-node true pj (list-ref tokens (- j 1))))
-                    '()))      ;; Side-effect free else clause.
-        '())))                 ;; Side-effect free else clause.
+                    (let ([first-node (hash-ref parse-hash (list j k right-first-index)
+                                                            default-false-node)]
+                          [second-node (hash-ref parse-hash (list (+ j k) (- i k) right-second-index)
+                                                             default-false-node)])
+                        (if (and (parse-node-boolean first-node) (parse-node-boolean second-node))
+                            (hash-set! parse-hash (list j i (production-index pj))
+                                      (parse-node true pj j i first-node second-node))
+                            '()))))    ;; Side-effect free else clause.
+            '())))                     ;; Side-effect free else clause.
 
 (define (valid-parse basic-grammar tokens parse-hash)
     ;; If any of P[1,n,x] is true (x is iterated over the set s, where s are all the indices for Rs)
-    (for ([(key value) (in-hash parse-hash)])
-        (if (match key (list 1 (length tokens) _))
-            (list key parse-hash)
-            '())))
+    (let ([root-node default-false-node])
+        (for ([(key value) (in-hash parse-hash)] #:when (= (length tokens) (car (cdr key))))
+            (set! root-node value))
+        root-node))
 
 (define (lookup-in-hash basic-grammar production-element)
     (hash-ref (grammar-rule-hash basic-grammar) production-element '()))
 
-(define (print-hash hash)
-    (for ([(key value) (in-hash hash)])
-        (printf "Key: ~a\n" key)))
-
-; (define (print-parse-node parse-output)
-;     (for ([(key value) (in-hash hash)]
-
-
+(define (default-false-node) (parse-node false "" "" "" "" ""))
 
 ;; Test parser with simple grammar
 (define g1 (production false 1 "Expr" "Var" "OpExpr"))
