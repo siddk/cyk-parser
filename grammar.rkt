@@ -35,7 +35,17 @@
 ;; You can transform these rules into Chomsky Normal Form, which the
 ;; CYK parser can understand.
 (define-syntax define-grammar
-  (syntax-rules (->)
-    [(define-grammar name ((binary-nonterminal -> left right) ...) ((unary-nonterminal -> terminal) ...))
-        (begin (display "Define-grammar is not implemented yet!\n")
-               (define name 'stub))]))
+    (syntax-rules (->)
+        [(define-grammar name ((binary-nonterminal -> left right) ...) ((unary-nonterminal -> terminal) ...)) ;; (*)
+            (define name
+                (let ()
+                    (define g-hash (make-hash))
+                    (begin (hash-set! g-hash (symbol->string 'binary-nonterminal) '()) ...)  ;; The ... is part of the Racket code
+                    (begin (hash-set! g-hash (symbol->string 'unary-nonterminal) '()) ...)
+
+                    ;; Code to create the list of productions
+                    (define prod-list '())
+
+                    (grammar prod-list g-hash)))]))
+
+
