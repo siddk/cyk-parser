@@ -40,12 +40,32 @@
             (define name
                 (let ()
                     (define g-hash (make-hash))
-                    (begin (hash-set! g-hash (symbol->string 'binary-nonterminal) '()) ...)  ;; The ... is part of the Racket code
-                    (begin (hash-set! g-hash (symbol->string 'unary-nonterminal) '()) ...)
+                    (define prod-list '())
+                    (begin (let ((count 1))
+                              ;; Check if binary terminal does not exist in hash, update production list, g-hash accordingly.
+                        (cond [(eq? (hash-ref g-hash (symbol->string 'binary-nonterminal) "Does not exist") "Does not exist")
+                               (begin (hash-set! g-hash (symbol->string 'binary-nonterminal) (list count))
+                                      (append prod-list (production false count (symbol->string 'binary-nonterminal)
+                                                        (symbol->string 'left) (symbol->string 'right))))]
+                              ;; Check if binary terminal does exist in hash
+                              [(not (eq? (hash-ref g-hash (symbol->string 'binary-nonterminal) "Does not exist") "Does not exist"))
+                               (begin (hash-set! g-hash (append (hash-ref g-hash (symbol->string 'binary-nonterminal)) (list count)))
+                                      (append prod-list (production false count (symbol->string 'binary-nonterminal)
+                                                        (symbol->string 'left) (symbol->string 'right))))]
+                              ;; Check if unary terminal does not exist in hash, update production list accordingly
+                              [(eq? (hash-ref g-hash (symbol->string 'unary-nonterminal) "Does not exist") "Does not exist")
+                                (begin (hash-set! g-hash (symbol->string 'unary-nonterminal) (list count))
+                                       (append prod-list (production true count (symbol->string 'unary-nonterminal)
+                                                         (symbol->string 'terminal) "")))]
+                              ;; Check if unary terminal does exist in hash
+                              [(not (eq? (hash-ref g-hash (symbol->string 'unary-nonterminal) "Does not exist") "Does not exist"))
+                               (begin (hash-set! g-hash (append (hash-ref g-hash (symbol->string 'unary-nonterminal)) (list count)))
+                                      (append prod-list (production true count (symbol->string 'unary-nonterminal)
+                                                        (symbol->string 'terminal) "")))])
+                        (set! count (+ count 1))
+                        ...))
+                    ; (begin (hash-set! g-hash (symbol->string 'binary-nonterminal) '()) ...)  ;; The ... is part of the Racket code
+                    ; (begin (hash-set! g-hash (symbol->string 'unary-nonterminal) '()) ...)
 
                     ;; Code to create the list of productions
-                    (define prod-list '())
-
                     (grammar prod-list g-hash)))]))
-
-
