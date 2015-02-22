@@ -3,7 +3,8 @@ Introduction
 
 This is skeleton code for a parser generator.  It is meant to be a
 fun, relatively small project that can be done to get more familiarity
-with Racket. Project compiled by Rohin Shah, as part of the Par Lab at UC Berkeley.
+with Racket. Spec compiled by Rohin Shah, project implemented by Siddharth Karamcheti
+as part of the Par Lab at UC Berkeley.
 
 The goal of this project is to take as input a grammar, such as:
 
