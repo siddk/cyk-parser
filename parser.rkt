@@ -111,6 +111,7 @@
      (Var -> "y")
      (Op -> "+")
      (Op -> "*")))
-  (printf "~a" arith))
+  (parse arith  '("x" "+" "y" "*" "y")))
 
+(arith-test)
 
