@@ -16,18 +16,54 @@ The goal of this project is to take as input a grammar, such as:
         Op -> "+"
         Op -> "*"
 
+Or:
+
+        S -> NP VP
+        NP -> ART ADJNOUN
+        ADJNOUN -> ADJ NOUN
+        VP -> V NP
+        ART -> "a"
+        ART -> "the"
+        ADJ -> "red"
+        ADJ -> "green"
+        ADJ -> "smelly"
+        NOUN -> "dog"
+        NOUN -> "cat"
+        NOUN -> "book"
+        NOUN -> "martian"
+        V -> "saw"
+        V -> "killed"
+        V -> "ate"
+
 and a list of tokens, such as:
 
         ("x" "*" "y" "+" "y")
 
 and use this to produce a parse tree, using the CYK algorithm:
 
-        (Expr (Var "x")
-              (OpExpr (Op "*")
-                      (Expr (Var "y")
-                            (OpExpr (Op "+")
-                                    (Expr (Var "y"))))))))
+        Expr (x + y * y)
+          Var (x)
+          OpExpr (+ y * y)
+             Op (+)
+             Expr (y * y)
+                Var (y)
+                OpExpr (* y)
+                   Op (*)
+                   Expr (y)
 
+        S (the smelly dog ate the red book)
+            NP (the smelly dog)
+               ART (the)
+               ADJNOUN (smelly dog)
+                  ADJ (smelly)
+                  NOUN (dog)
+            VP (ate the red book)
+               V (ate)
+               NP (the red book)
+                  ART (the)
+                  ADJNOUN (red book)
+                     ADJ (red)
+                     NOUN (book)
 
 Architecture
 ------------
@@ -43,7 +79,7 @@ this by looking at the tests in `tests.rkt`.
 Necessary Steps
 ---------------
 
-To complete the parser generator, you will need to:
+The following steps describe the process I used to complete the parser generator:
 
 1. Come up with a representation for grammars (see `grammar.rkt`)
 2. Come up with a representation for parse trees (see
@@ -59,7 +95,7 @@ Resources
 1. The Racket Guide: http://docs.racket-lang.org/guide/  This is a
    guide to Racket that is targeted at beginners.  This is the main
    resource I used when learning Racket (having already learned
-   Scheme).  If you also come from a Scheme background, I especially
+   Scheme). If you also come from a Scheme background, I especially
    recommend:
     + Section 5 (programmer-defined datatypes)
     + Section 11 (iterations and comprehensions)
@@ -72,9 +108,8 @@ Resources
 2. The Racket Reference:  This is a manual.  Only refer to it if for
    some reason the Guide is not sufficient.
 
-3. For the CYK algorithm, Google should be able to give you tutorials
-   and guides.  One thing to keep in mind - probably all of the
+3. For the CYK algorithm, Google has all the necessary tutorials
+   and guides. One thing to keep in mind - probably all of the
    results will show you a dynamic programming approach, but it can
    also be done with memoized recursion.  (This is true of almost all
-   dynamic programs.) (If this doesn't make sense, you can just follow
-   the pseudocode from Wikipedia or other sources.)
+   dynamic programs.)

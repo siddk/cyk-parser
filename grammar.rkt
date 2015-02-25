@@ -35,35 +35,34 @@
 ;; You can transform these rules into Chomsky Normal Form, which the
 ;; CYK parser can understand.
 (define-syntax define-grammar
-    (syntax-rules (->)
-        [(define-grammar name ((binary-nonterminal -> left right) ...) ((unary-nonterminal -> terminal) ...)) ;; (*)
-            (define name
-                (let ()
-                    (define g-hash (make-hash))
-                    (define prod-list '())
-                    (begin
-                        (begin (let ((count 1))
-                            ;; Check if binary terminal does not exist in hash, update production list, g-hash accordingly.
-                            (begin (begin (if (eq? (hash-ref g-hash (symbol->string 'binary-nonterminal) "DNE") "DNE")
-                                (begin (hash-set! g-hash (symbol->string 'binary-nonterminal) (list count))
-                                       (set! prod-list (append prod-list
-                                                       (list (production false count (symbol->string 'binary-nonterminal)
-                                                             (symbol->string 'left) (symbol->string 'right))))))
-                                (begin (hash-set! g-hash (symbol->string 'binary-nonterminal)
-                                                         (append (hash-ref g-hash (symbol->string 'binary-nonterminal)) (list count)))
-                                       (set! prod-list (append prod-list
-                                                       (list (production false count (symbol->string 'binary-nonterminal)
-                                                             (symbol->string 'left) (symbol->string 'right)))))))
-                                (set! count (+ count 1))) ...)
-                            ;; Check if unary terminal does not exist in hash, update production list, g-hash accordingly.
-                            (begin (begin (if (eq? (hash-ref g-hash (symbol->string 'unary-nonterminal) "DNE") "DNE")
-                                (begin (hash-set! g-hash (symbol->string 'unary-nonterminal) (list count))
-                                       (set! prod-list (append prod-list
-                                             (list (production true count (symbol->string 'unary-nonterminal) 'terminal "")))))
-                                (begin (hash-set! g-hash (symbol->string 'unary-nonterminal)
-                                                         (append (hash-ref g-hash (symbol->string 'unary-nonterminal)) (list count)))
-                                       (set! prod-list (append prod-list
-                                             (list (production true count (symbol->string 'unary-nonterminal) 'terminal ""))))))
-                                (set! count (+ count 1))) ...))))
-                    ;; Code to create the list of productions
-                    (grammar prod-list g-hash)))]))
+  (syntax-rules (->)
+    [(define-grammar name ((binary-nonterminal -> left right) ...) ((unary-nonterminal -> terminal) ...))
+        (define name
+            (let ()
+                (define counter 0)
+                (define (count)
+                    (set! counter (+ 1 counter))
+                    counter)
+
+                (define g-hash (make-hash))
+                (begin (hash-set! g-hash (symbol->string 'binary-nonterminal) '()) ...)
+                (begin (hash-set! g-hash (symbol->string 'unary-nonterminal) '()) ...)
+
+                (define prod-list '())
+                (begin
+                    (let ((next (count)))
+                        (hash-set! g-hash (symbol->string 'binary-nonterminal)
+                                          (cons next (hash-ref g-hash (symbol->string 'binary-nonterminal))))
+                    (set! prod-list (cons (production false next (symbol->string 'binary-nonterminal)
+                                                                 (symbol->string 'left) (symbol->string 'right))
+                                                                                                    prod-list)))
+                ...)
+                (begin
+                    (let ((next (count)))
+                        (hash-set! g-hash (symbol->string 'unary-nonterminal)
+                                          (cons next (hash-ref g-hash (symbol->string 'unary-nonterminal))))
+                    (set! prod-list (cons (production (string? 'terminal) next (symbol->string 'unary-nonterminal)
+                                                      (if (symbol? 'terminal) (symbol->string 'terminal) 'terminal) "")
+                                                                                                           prod-list)))
+                ...)
+                (grammar (reverse prod-list) g-hash)))]))
